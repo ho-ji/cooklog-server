@@ -5,12 +5,20 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SendEmailModule } from './send-email/send-email.module';
-import { RedisService } from './redis/redis.service';
+import { VerificationCodeModule } from './verification-code/verification-code.module';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    RedisModule.forRoot({
+      config: {
+        host: 'localhost',
+        port: 6379,
+        password: 'authpassword',
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -28,8 +36,9 @@ import { RedisService } from './redis/redis.service';
     }),
     UserModule,
     SendEmailModule,
+    VerificationCodeModule,
   ],
   controllers: [AppController],
-  providers: [AppService, RedisService],
+  providers: [AppService],
 })
 export class AppModule {}
