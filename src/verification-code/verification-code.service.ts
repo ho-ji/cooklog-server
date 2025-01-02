@@ -9,11 +9,12 @@ export class VerificationCodeService {
   constructor(private readonly redisService: RedisService) {
     this.redis = this.redisService.getOrThrow();
   }
-  async saveVerificationCode(email: string) {
+  async saveVerificationCode(email: string): Promise<string> {
     const code = codeGenerator();
     const ttl = 180;
     await this.redis.del(email);
     await this.redis.setex(email, ttl, code);
+    return code;
   }
   async getVerificationCode(email: string): Promise<string | null> {
     return await this.redis.get(email);
