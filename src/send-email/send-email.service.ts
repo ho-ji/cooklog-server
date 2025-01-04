@@ -12,8 +12,10 @@ export class SendEmailService {
   async sendVerificationCode(email: string, verificationCode: string) {
     const mail: SendGrid.MailDataRequired = {
       to: email,
-      from: this.configService.get<string>('SEND_EMAIL_ADDRESS'),
-      subject: '[쿡로그] 회원가입 이메일 인증 안내',
+      from: {
+        name: '쿡로그',
+        email: this.configService.get<string>('SEND_EMAIL_ADDRESS'),
+      },
       templateId: this.configService.get<string>('SENDGRID_TEMPLATE_ID'),
       dynamicTemplateData: { verificationCode },
     };
