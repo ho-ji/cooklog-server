@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { VerificationCodeService } from 'src/verification-code/verification-code.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
+import { DefaultResponse } from 'src/utils/types/response.type';
 
 @Controller('/api/user')
 export class UserController {
@@ -12,9 +13,12 @@ export class UserController {
   ) {}
 
   @Get('/verify-email/:email')
-  async verifyEmail(@Param('email') email: string): Promise<object> {
+  async verifyEmail(
+    @Param('email') email: string,
+  ): Promise<DefaultResponse<boolean>> {
     const isEmailTaken: boolean = await this.userService.checkEmail(email);
     return {
+      success: true,
       data: isEmailTaken,
       message: isEmailTaken
         ? 'Email is already in use'
@@ -23,7 +27,7 @@ export class UserController {
   }
 
   @Post('/send-verification-code/:email')
-  async sendVerificationCode(@Param('email') email: string) {
+  async sendVerificationCode(@Param('email') email: string): Promise<void> {
     const verificationCode: string =
       await this.verificationCodeService.saveVerificationCode(email);
     await this.sendEmailService.sendVerificationCode(email, verificationCode);
@@ -33,7 +37,7 @@ export class UserController {
   async checkVerificationCode(
     @Body('code') code: string,
     @Body('email') email: string,
-  ): Promise<object> {
+  ): Promise<DefaultResponse<boolean>> {
     const verificationCode: string =
       await this.verificationCodeService.getVerificationCode(email);
 
@@ -47,17 +51,20 @@ export class UserController {
     return {
       success: true,
       data: isCodeCorrect,
-      messages: isCodeCorrect
+      message: isCodeCorrect
         ? 'Email verificaiotn success'
         : 'Verification code is incorrect',
     };
   }
 
   @Get('/verify-nickname/:nickname')
-  async verfiyNickname(@Param('nickname') nickname: string): Promise<object> {
+  async verfiyNickname(
+    @Param('nickname') nickname: string,
+  ): Promise<DefaultResponse<boolean>> {
     const isNicknameTaken: boolean =
       await this.userService.checkNickname(nickname);
     return {
+      success: true,
       data: isNicknameTaken,
       message: isNicknameTaken
         ? 'Nickname is already in use'
