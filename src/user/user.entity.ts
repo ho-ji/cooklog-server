@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -22,4 +23,15 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  @Column({ type: 'boolean', default: false })
+  marketingAgreement: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  eventNotificationAgreement: boolean;
+
+  @BeforeInsert()
+  private async beforeInsert() {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
 }

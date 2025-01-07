@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { VerificationCodeService } from 'src/verification-code/verification-code.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
 import { DefaultResponse } from 'src/utils/types/response.type';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('/api/user')
 export class UserController {
@@ -69,6 +70,17 @@ export class UserController {
       message: isNicknameTaken
         ? 'Nickname is already in use'
         : 'Nickname is available for signup',
+    };
+  }
+
+  @Post('/signup')
+  async signUp(
+    @Body('user') dto: CreateUserDto,
+  ): Promise<DefaultResponse<void>> {
+    const success = await this.userService.addUser(dto);
+    return {
+      success,
+      message: success ? 'Signup success' : 'Signup fail',
     };
   }
 }

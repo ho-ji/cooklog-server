@@ -1,7 +1,7 @@
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { codeGenerator } from 'src/utils/codeGenerator';
+import { codeGenerator } from 'src/utils/functions/codeGenerator';
 
 @Injectable()
 export class VerificationCodeService {
