@@ -21,12 +21,8 @@ export class UserService {
     return !!user;
   }
 
-  async addUser(dto: CreateUserDto): Promise<boolean> {
-    const isEmailTaken = await this.checkEmail(dto.email);
-    const isNicknameTaken = await this.checkNickname(dto.email);
-    if (isEmailTaken || isNicknameTaken) return false;
+  async addUser(dto: CreateUserDto): Promise<void> {
     const user = this.userRepository.create(dto);
     await this.userRepository.save(user);
-    return true;
   }
 }

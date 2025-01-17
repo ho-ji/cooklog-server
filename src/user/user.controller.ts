@@ -74,13 +74,15 @@ export class UserController {
   }
 
   @Post('/signup')
-  async signUp(
-    @Body('user') dto: CreateUserDto,
-  ): Promise<DefaultResponse<void>> {
-    const success = await this.userService.addUser(dto);
+  async signUp(@Body() dto: CreateUserDto): Promise<DefaultResponse<object>> {
+    const isEmailTaken = await this.userService.checkEmail(dto.email);
+    const isNicknameTaken = await this.userService.checkNickname(dto.nickname);
+    await this.userService.addUser(dto);
+    const success = !isEmailTaken && !isNicknameTaken;
     return {
       success,
       message: success ? 'Signup success' : 'Signup fail',
+      data: { email: isEmailTaken, nickname: isNicknameTaken },
     };
   }
 }
