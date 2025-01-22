@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BeforeInsert,
+  DeleteDateColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Entity()
@@ -15,13 +23,13 @@ export class User {
   @Column({ unique: true })
   nickname: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn()
   deletedAt: Date;
 
   @Column({ type: 'boolean', default: false })
