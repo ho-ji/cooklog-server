@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SendEmailModule } from './send-email/send-email.module';
 import { VerificationCodeModule } from './verification-code/verification-code.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { AuthModule } from './auth/auth.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
       },
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule, ScheduleModule.forRoot()],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
@@ -37,6 +39,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
     UserModule,
     SendEmailModule,
     VerificationCodeModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
