@@ -85,4 +85,19 @@ export class UserController {
       data: { email: isEmailTaken, nickname: isNicknameTaken },
     };
   }
+
+  @Post('/signin')
+  async signIn(
+    @Body() body: { email: string; password: string },
+  ): Promise<DefaultResponse<object>> {
+    const res = await this.userService.validateUser(body.email, body.password);
+    return {
+      success: !!res,
+      message: !!res ? 'Signin success' : 'Signin fail',
+      data: {
+        accessToken: '',
+        uid: res,
+      },
+    };
+  }
 }
