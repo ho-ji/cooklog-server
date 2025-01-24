@@ -1,9 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { VerificationCodeService } from 'src/verification-code/verification-code.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
 import { DefaultResponse } from 'src/utils/types/response.type';
 import { CreateUserDto } from './dto/create-user.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { Response } from 'express';
+import { CreateAuthDto } from 'src/auth/dto/create-auth.dto';
 
 @Controller('/api/user')
 export class UserController {
@@ -11,6 +14,7 @@ export class UserController {
     private readonly userService: UserService,
     private readonly verificationCodeService: VerificationCodeService,
     private readonly sendEmailService: SendEmailService,
+    private readonly authService: AuthService,
   ) {}
 
   @Get('/verify-email/:email')
@@ -89,15 +93,32 @@ export class UserController {
   @Post('/signin')
   async signIn(
     @Body() body: { email: string; password: string },
-  ): Promise<DefaultResponse<object>> {
-    const res = await this.userService.validateUser(body.email, body.password);
-    return {
-      success: !!res,
-      message: !!res ? 'Signin success' : 'Signin fail',
-      data: {
-        accessToken: '',
-        uid: res,
-      },
+    @Res() res: Response,
+  ): Promise<void> {
+    const uid = await this.userService.validateUser(body.email, body.password);
+    if (!uid) {
+      res.status(401).json({
+        success: false,
+        message: 'Signin failed',
+        data: null,
+      });
+      return;
+    }
+    const dto: CreateAuthDto = {
+      email: body.email,
+      id: uid,
     };
+    const accessToken = await this.authService.generateAccessToken(dto);
+    const refreshToken = await this.authService.generateRefreshToken(dto);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    res.json({
+      success: true,
+      message: 'Signin success',
+      data: {
+        accessToken,
+        uid,
+      },
+    });
+    return;
   }
 }
