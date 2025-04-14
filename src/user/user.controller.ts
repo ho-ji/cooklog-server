@@ -1,7 +1,5 @@
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { VerificationCodeService } from 'src/verification-code/verification-code.service';
-import { SendEmailService } from 'src/send-email/send-email.service';
 import { DefaultResponse } from 'src/utils/types/response.type';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from 'src/auth/auth.service';
@@ -12,55 +10,8 @@ import { CreateAuthDto } from 'src/auth/dto/create-auth.dto';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly verificationCodeService: VerificationCodeService,
-    private readonly sendEmailService: SendEmailService,
     private readonly authService: AuthService,
   ) {}
-
-  @Get('/verify-email/:email')
-  async verifyEmail(
-    @Param('email') email: string,
-  ): Promise<DefaultResponse<boolean>> {
-    const isEmailTaken: boolean = await this.userService.checkEmail(email);
-    return {
-      success: true,
-      data: isEmailTaken,
-      message: isEmailTaken
-        ? 'Email is already in use'
-        : 'Email is available for signup',
-    };
-  }
-
-  @Post('/send-verification-code/:email')
-  async sendVerificationCode(@Param('email') email: string): Promise<void> {
-    const verificationCode: string =
-      await this.verificationCodeService.saveVerificationCode(email);
-    await this.sendEmailService.sendVerificationCode(email, verificationCode);
-  }
-
-  @Post('/check-verification-code')
-  async checkVerificationCode(
-    @Body('code') code: string,
-    @Body('email') email: string,
-  ): Promise<DefaultResponse<boolean>> {
-    const verificationCode: string =
-      await this.verificationCodeService.getVerificationCode(email);
-
-    if (!verificationCode)
-      return {
-        success: false,
-        message: 'Email verification expired',
-      };
-
-    const isCodeCorrect = code === verificationCode;
-    return {
-      success: true,
-      data: isCodeCorrect,
-      message: isCodeCorrect
-        ? 'Email verificaiotn success'
-        : 'Verification code is incorrect',
-    };
-  }
 
   @Get('/verify-nickname/:nickname')
   async verfiyNickname(

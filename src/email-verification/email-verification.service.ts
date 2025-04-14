@@ -4,7 +4,7 @@ import Redis from 'ioredis';
 import { codeGenerator } from 'src/utils/functions/codeGenerator';
 
 @Injectable()
-export class VerificationCodeService {
+export class EmailVerificationService {
   private readonly redis: Redis;
   constructor(private readonly redisService: RedisService) {
     this.redis = this.redisService.getOrThrow();
